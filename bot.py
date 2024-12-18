@@ -113,7 +113,7 @@ class Planes:
                         f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
                         f"{Fore.MAGENTA + Style.BRIGHT}] [{Style.RESET_ALL}"
                         f"{Fore.GREEN + Style.BRIGHT} Successfully Generated Token {Style.RESET_ALL}"
-                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                           "
+                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                   "
                     )
                     accounts.insert(idx, {"first_name": account_name, "token": token})
                 else:
@@ -123,7 +123,7 @@ class Planes:
                         f"{Fore.YELLOW + Style.BRIGHT}Query Is Expired{Style.RESET_ALL}"
                         f"{Fore.MAGENTA + Style.BRIGHT} ] [{Style.RESET_ALL}"
                         f"{Fore.RED + Style.BRIGHT} Failed to Generate Token {Style.RESET_ALL}"
-                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                           "
+                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                    "
                     )
 
                 await asyncio.sleep(1)
@@ -139,7 +139,7 @@ class Planes:
         
         if account and "token" in account:
             token = account["token"]
-            if not self.user_profile(token):
+            if not await self.user_profile(token):
                 print(
                     f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
                     f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
@@ -166,7 +166,7 @@ class Planes:
                             f"{Fore.GREEN + Style.BRIGHT}Query Is Valid{Style.RESET_ALL}"
                             f"{Fore.MAGENTA + Style.BRIGHT} ] [{Style.RESET_ALL}"
                             f"{Fore.GREEN + Style.BRIGHT} Successfully Generated Token {Style.RESET_ALL}"
-                            f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                           "
+                            f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}             "
                         )
                     else:
                         self.log(
@@ -175,7 +175,7 @@ class Planes:
                             f"{Fore.YELLOW + Style.BRIGHT}Query Is Expired{Style.RESET_ALL}"
                             f"{Fore.MAGENTA + Style.BRIGHT} ] [{Style.RESET_ALL}"
                             f"{Fore.RED + Style.BRIGHT} Failed to Generate Token {Style.RESET_ALL}"
-                            f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                           "
+                            f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                 "
                         )
                 else:
                     self.log(
@@ -183,7 +183,7 @@ class Planes:
                         f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
                         f"{Fore.MAGENTA + Style.BRIGHT}] [{Style.RESET_ALL}"
                         f"{Fore.YELLOW + Style.BRIGHT} Query Is None. Skipping {Style.RESET_ALL}"
-                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                           "
+                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                      "
                     )
 
                 await asyncio.sleep(1)
@@ -230,6 +230,9 @@ class Planes:
             try:
                 async with ClientSession(timeout=ClientTimeout(total=20)) as session:
                     async with session.get(url=url, headers=headers) as response:
+                        if response.status == 401:
+                            return None
+                        
                         response.raise_for_status()
                         return await response.json()
             except (Exception, ClientResponseError) as e:
